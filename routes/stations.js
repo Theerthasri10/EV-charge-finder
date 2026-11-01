@@ -18,7 +18,7 @@ const DISTANCE_SQL = `
 // GET /stations - returns all EV stations
 router.get('/', async (req, res) => {
   try {
-    const [rows] = await db.query('SELECT * FROM stations');
+    const [rows] = await db.query('SELECT * FROM stations WHERE is_active = 1');
     res.json(rows);
   } catch (err) {
     console.error(err);
@@ -42,7 +42,7 @@ router.get('/nearby', async (req, res) => {
     const [nearby] = await db.query(
       `SELECT *, ${DISTANCE_SQL} AS distance_km
        FROM stations
-       WHERE latitude IS NOT NULL AND longitude IS NOT NULL
+       WHERE is_active = 1 AND latitude IS NOT NULL AND longitude IS NOT NULL
        HAVING distance_km <= ?
        ORDER BY distance_km ASC`,
       [lat, lng, lat, MAX_RADIUS_KM]
@@ -68,7 +68,7 @@ router.get('/nearby', async (req, res) => {
     const [nearest] = await db.query(
       `SELECT *, ${DISTANCE_SQL} AS distance_km
        FROM stations
-       WHERE latitude IS NOT NULL AND longitude IS NOT NULL
+       WHERE is_active = 1 AND latitude IS NOT NULL AND longitude IS NOT NULL
        ORDER BY distance_km ASC
        LIMIT 1`,
       [lat, lng, lat]
